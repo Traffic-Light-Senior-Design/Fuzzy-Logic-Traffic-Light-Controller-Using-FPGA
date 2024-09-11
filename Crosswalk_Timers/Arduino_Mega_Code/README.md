@@ -1,0 +1,21 @@
+# UART to Seven-Segment Display Test Suite
+
+This folder contains a collection of Arduino sketches used to test the functionality of receiving data via UART from an FPGA and displaying it on seven-segment displays. The project involves receiving bytes through UART communication and displaying them on one or multiple seven-segment displays, with additional countdown logic integrated. The sketches incrementally build on each other, testing individual aspects of UART reception, display control, and countdown logic, culminating in a final sketch that integrates all functionalities.
+
+## Sketches Overview
+
+### **Uart_To_SSD_Test Sketch**
+This Arduino sketch tests the reception of a byte via UART from an FPGA and displays the corresponding number (between 0 and 99) on a two-digit seven-segment display. The received byte is split into tens and ones digits, which are then displayed on the two segments. The sketch also implements a countdown feature that decrements the displayed number after each cycle. Once the countdown reaches zero, the digits are turned off, and the countdown stops. This code is primarily used to verify UART communication, correct digit display, and countdown logic on the seven-segment display.
+
+### **uart_serial_test Sketch**
+This Arduino sketch is designed to receive four non-zero bytes via UART communication from an FPGA and store them in an array. It continuously reads bytes from the Serial1 interface, checking for non-zero values and counting them until four valid bytes are received. The received bytes are printed in hexadecimal format for verification, and once all four non-zero bytes are received, a message is printed to indicate completion. The process then resets, ready to receive another set of bytes after a short delay. This code tests the ability to filter and process incoming UART data from an FPGA, focusing specifically on non-zero byte detection.
+
+### **Display_4_Segments Sketch**
+This Arduino sketch controls four separate seven-segment displays to show specific digits on each display. Each display is connected to different sets of segment and common pins, with digits from 0 to 9 represented by specific patterns. The `setup()` function initializes all segment and common pins as outputs, while the `loop()` function displays the numbers '12' on Display 1, '34' on Display 2, '56' on Display 3, and '78' on Display 4. The function `displayDigit()` is used to control which digit is displayed by setting the corresponding segment pins and activating the appropriate common pin for each display. The code tests the ability to control multiple seven-segment displays simultaneously and ensures the digits are displayed correctly by multiplexing the segments and common pins across the displays.
+
+### **Four_Display_Countdown Sketch**
+This Arduino sketch controls four seven-segment displays to show and decrement countdown timers. Each display is associated with a specific set of segment and common pins, and the digits from 0 to 9 are displayed using common anode configurations. The countdown starts from preset values for each display and decrements every second until all displays reach 00. The `displayNumber()` function handles the separation of digits into tens and ones, while the `displayDigit()` function sets the appropriate segments for each digit. The sketch continuously refreshes the displays for smooth visualization, testing the functionality of multiple countdowns across four independent seven-segment displays.
+
+### **UART_To_Display_Countdown Sketch**
+This Arduino sketch is the final version that combines all previously tested functionalities. It controls four seven-segment displays connected to the Arduino, receiving data from an FPGA via UART. Each display has its own set of segment and common pins, and the code displays countdown values received from the FPGA. The sketch reads four bytes from the FPGA, stores them in an array, and displays each byte on its corresponding seven-segment display. The countdown values decrement every second, and when any display reaches zero, it is turned off. This final code integrates UART communication, multiple display control, and countdown logic tested in earlier sketches, ensuring smooth, synchronized display updates and clear handling of data received from the FPGA.
+
