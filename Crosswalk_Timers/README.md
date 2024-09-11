@@ -44,10 +44,42 @@ The crosswalk timing system works by using sensors or other inputs to feed into 
 
 ## Installation and Usage
 
-1. **FPGA Side**: Synthesize and upload the VHDL code in the `fpga/` and `fpga/UART` folders to your FPGA board.
-2. **Arduino Side**: Upload the UART_To_Display_Countdown Arduino sketch in the `arduino/` folder to your Arduino board.
-3. Connect the UART TX pin from the FPGA to the RX pin of the Arduino.
-4. Power up both systems, and based on the input to the FPGA, the crosswalk timers will be displayed on the Arduino’s seven-segment displays.
+### 1. FPGA Side:
+- **Synthesis**: 
+  - Open **Xilinx Vivado** and create a new project.
+  - Add the VHDL files from both the `fpga/` and `fpga/UART/` folders to the project.
+    - The **`fpga/UART/`** folder contains the `UART_TX`, `UART_RX`, and `UART` modules responsible for handling UART communication. These modules define how data is transmitted and received.
+    - The **`fpga/`** folder contains the higher-level modules `UART_TEST_Top` and `UART_Byte_Transmitter`. These modules should be added to the Vivado project as the top-level files. The `UART_Byte_Transmitter` module handles the dynamic selection of byte sequences based on fuzzy logic inputs and controls the UART communication.
+- **Implementation**: 
+  - Synthesize the project and generate the bitstream.
+  - Upload the bitstream to the FPGA using Vivado's hardware manager.
+
+### 2. Arduino Side:
+- **Arduino Sketches**:
+  - Open the Arduino IDE and upload the appropriate sketches from the `arduino/` folder to your Arduino board.
+  - The **UART_To_Display_Countdown** sketch is the final version that receives timer values from the FPGA via UART and displays them on four seven-segment displays. Each display corresponds to a crosswalk timer countdown, updating dynamically as new values are received from the FPGA.
+  
+### 3. Hardware Connections:
+
+- **UART Communication**: 
+  - Connect the UART TX pin from the FPGA to the RX pin of the Arduino.
+  - Ensure that the ground (GND) between the FPGA and Arduino is connected.
+
+- **Level Shifter**:
+  - A **level shifter** is required because the FPGA operates at 3.3V logic, while the Arduino uses 5V logic. To ensure safe and reliable communication, we used a simple level-shifting circuit composed of a single N-channel MOSFET (BSS138) and two 10k resistors per channel. This setup mirrors the configuration used in the SparkFun logic level converter.
+
+  ![Level Shifter Diagram](https://cdn.sparkfun.com/assets/f/3/3/4/4/526842ae757b7f1b128b456f.png)
+
+  *Image courtesy of [SparkFun](https://learn.sparkfun.com/tutorials/bi-directional-logic-level-converter-hookup-guide/all).*
+
+  - The level shifter effectively translates voltage levels between devices, ensuring safe communication between the FPGA (3.3V logic) and the Arduino (5V logic). This specific design is based on the SparkFun bi-directional logic level converter.
+
+  
+### 4. Running the System:
+- Power both the FPGA and Arduino boards.
+- The FPGA will begin transmitting crosswalk timer values based on the fuzzy logic input, and the Arduino will display the countdown timers on the seven-segment displays.
+- As the fuzzy input changes, the FPGA will adjust the timer values accordingly, sending new data to the Arduino, which will update the displays in real-time.
+
 
 ---
 
