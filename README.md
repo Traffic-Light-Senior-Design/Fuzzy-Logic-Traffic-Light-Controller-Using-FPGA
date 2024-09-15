@@ -49,8 +49,5 @@ Each direction's traffic is managed independently:
 ## Future Improvements
 
 - Implement waiting time calculations for each lane to further optimize traffic flow.
-- Explore integrating Vehicle-to-Everything (V2X) communication to improve decision-making based on real-time vehicle data.
-
+  
 ---
-
-You can copy this directly into your `README.md` file on GitHub!
