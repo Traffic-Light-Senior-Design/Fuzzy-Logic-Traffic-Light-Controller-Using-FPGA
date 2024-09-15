@@ -1,4 +1,3 @@
-Certainly! Here's the README in proper Markdown format, ready to be copied into your GitHub project:
 
 ---
 
