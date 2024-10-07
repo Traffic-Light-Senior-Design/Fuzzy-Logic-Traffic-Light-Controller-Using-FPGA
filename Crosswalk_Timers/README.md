@@ -4,6 +4,14 @@
 
 This part of the project implements a dynamic crosswalk timing system using a combination of FPGA and Arduino platforms. The system uses fuzzy logic to determine crosswalk timer values and communicates these values from the FPGA to the Arduino via UART. The Arduino then displays the timers on seven-segment displays, counting down based on the transmitted data.
 
+### Video Demonstrations
+
+- [Project Overview and Walkthrough](https://youtu.be/2OkmlQgGkp4?feature=shared)
+- [System in Action](https://youtu.be/utTD4CJFkgI?feature=shared)
+
+These videos provide a detailed look at the system in operation and the technical details behind the crosswalk timer implementation.
+
+
 The project is divided into two main parts:
 
 1. **FPGA Side**: Handles the generation and transmission of crosswalk timer values based on input from fuzzy logic (representing conditions like pedestrian presence or traffic volume). It uses a UART interface to send these values to the Arduino.
