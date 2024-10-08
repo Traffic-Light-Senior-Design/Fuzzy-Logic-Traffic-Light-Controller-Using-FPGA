@@ -1,0 +1,55 @@
+[System]
+Name='L3_L5_L4_Sequence_TrafficLightController'
+Type='sugeno'
+Version=2.0
+NumInputs=3
+NumOutputs=1
+NumRules=10
+AndMethod='prod'
+OrMethod='probor'
+ImpMethod='prod'
+AggMethod='sum'
+DefuzzMethod='wtaver'
+
+[Input1]
+Name='L3'
+Range=[0 100]
+NumMFs=3
+MF1='Low':'trimf',[0 0 45]
+MF2='Medium':'trimf',[10 45 80]
+MF3='High':'trapmf',[45 80 100 100]
+
+[Input2]
+Name='L5'
+Range=[0 100]
+NumMFs=3
+MF1='Low':'trimf',[0 0 45]
+MF2='Medium':'trimf',[10 45 80]
+MF3='High':'trapmf',[45 80 100 100]
+
+[Input3]
+Name='L4'
+Range=[0 100]
+NumMFs=2
+MF1='0/1':'trapmf',[0 0 20 80]
+MF2='>1':'trapmf',[20 80 100 100]
+
+[Output1]
+Name='GreenLightDuration'
+Range=[0 45]
+NumMFs=3
+MF1='Low':'constant',[15]
+MF2='Medium':'constant',[30]
+MF3='High':'constant',[45]
+
+[Rules]
+1 0 0, 1 (1) : 1
+0 1 0, 1 (1) : 1
+2 2 1, 1 (1) : 1
+3 2 1, 2 (1) : 1
+2 3 1, 2 (1) : 1
+2 2 2, 2 (1) : 1
+3 2 2, 3 (1) : 1
+2 3 2, 3 (1) : 1
+3 3 2, 3 (1) : 1
+0 0 1, 1 (1) : 1
