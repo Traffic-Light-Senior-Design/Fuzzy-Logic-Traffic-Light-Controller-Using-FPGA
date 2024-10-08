@@ -5,9 +5,7 @@
 
 This project uses four distinct Fuzzy Inference System (FIS) files, one for each set of traffic lanes, to dynamically control the green light duration based on traffic density. The fuzzy logic allows for non-linear decision-making, which is more flexible and adaptive compared to traditional methods.
 
-## NOTE: 
-
-The following files are recommended to be used with a simulation software that will be capable of handling sequencing logic for each of the following FIS files (corresponding to a series of sequences) such as AnyLogic Simulation.
+**NOTE**: The following files are recommended to be used with a simulation software that will be capable of handling sequencing logic for each of the following FIS files (corresponding to a series of sequences) such as AnyLogic Simulation.
 
 ## Overview of the FIS Files
 
