@@ -65,17 +65,26 @@ The following image shows the simulation results of the fuzzy controller testben
 ### File: `output_tb.vhd`
 
 ### Overview
-The `output_tb` file tests the `output` module responsible for defuzzification, where fuzzy membership degrees are converted into a crisp value. This testbench applies predefined fuzzy membership degrees and singleton values and monitors the final crisp output.
+The `output_tb` testbench evaluates the defuzzification functionality within the output module. In this test, fuzzy membership degrees are converted into a crisp output value, ensuring the output module’s logic correctly integrates membership values and singleton values into a single control output. This testbench applies predefined fuzzy membership degrees and singleton values, then monitors and reports the final crisp output to validate proper functionality.
 
-### Signals:
-- **output_mf_values_tb**: Fuzzy membership values for the output membership functions (Low, Medium, High).
-- **singleton_values_tb**: Predefined singleton values representing the crisp values for each fuzzy output.
-- **crisp_output_tb**: The resulting crisp output after defuzzification.
+### Purpose
+This testbench ensures the output module's defuzzification process translates fuzzy membership inputs into a meaningful crisp output. The module is critical for producing actionable outputs from fuzzy logic evaluations, making it essential to validate the accuracy of the defuzzification operation.
 
-### Test Cases:
-1. **Set fuzzy membership degrees**: Apply fuzzy membership values for Low, Medium, and High.
-2. **Set singleton values**: Set singleton values on the universe of discourse for Low, Medium, and High.
-3. **Monitor crisp output**: Monitor and report the final crisp output.
+### Signals
+- **output_mf_values_tb**: Fuzzy membership values for the output membership functions, corresponding to Low, Medium, and High degrees.
+- **singleton_values_tb**: Predefined singleton values representing crisp outputs for each fuzzy membership degree.
+- **crisp_output_tb**: The resulting crisp output signal after defuzzification, representing the system's final actionable output.
+
+### Test Cases
+1. **Set Fuzzy Membership Degrees**: Applies fuzzy membership values for Low, Medium, and High outputs, simulating different degrees of input conditions.
+2. **Set Singleton Values**: Assigns singleton values within the universe of discourse for each membership function, representing crisp values for Low, Medium, and High outputs.
+3. **Monitor Crisp Output**: Observes and reports the final crisp output after defuzzification, ensuring that the output aligns with the expected result based on fuzzy inputs and singleton values.
+
+### Testbench Simulation
+The following image illustrates the simulation results of the output testbench, displaying how the module computes the final crisp output:
+
+![Output Testbench Simulation](../images/Output_TestBench.png)
+
 
 ---
 
@@ -84,19 +93,28 @@ The `output_tb` file tests the `output` module responsible for defuzzification, 
 ### File: `tb_rule_base.vhd`
 
 ### Overview
-The `tb_rule_base` file tests the `rule_base` module, which applies fuzzy logic rules based on input membership degrees and outputs fuzzy membership values for the output membership functions. The rules use AND or OR logic, depending on the configuration.
+The `tb_rule_base` testbench evaluates the `rule_base` module, which applies fuzzy logic rules based on input membership degrees and produces fuzzy membership values for each output membership function. The module uses configurable rules with either AND or OR logic, as specified in the test cases. This testbench verifies that each rule is correctly applied and that the combined outputs reflect the fuzzy logic rules set for each condition.
 
-### Signals:
-- **rule_type_array**: Defines whether each rule uses AND (0) or OR (1) logic.
-- **rule_conditions_array**: Specifies the membership functions involved in each rule.
-- **membership_degrees**: Input membership degrees.
-- **rule_output**: Fuzzy membership degrees for each rule.
-- **combined_outputs**: Final fuzzy membership values for the output membership functions.
+### Purpose
+This testbench ensures that the `rule_base` module correctly interprets and applies fuzzy logic rules to generate fuzzy membership values for each output. The testbench is essential for verifying that the module can handle multiple rule conditions and accurately apply fuzzy logic across different combinations of input conditions and rule types.
 
-### Test Cases:
-1. **Reset condition**: Applies reset for system initialization.
-2. **Rule conditions**: Defines rule conditions for input membership functions and sets input degrees.
-3. **Monitor rule outputs**: Check the outputs from each rule and combined outputs for the final result.
+### Signals
+- **rule_type_array**: An array defining whether each rule uses AND (0) or OR (1) logic.
+- **rule_conditions_array**: Specifies the membership functions involved in each rule, indicating the inputs that contribute to each rule.
+- **membership_degrees**: Input membership degrees received from the fuzzification process.
+- **rule_output**: Fuzzy membership degrees for each rule, representing intermediate outputs.
+- **combined_outputs**: Final fuzzy membership values for each output membership function after processing all rules.
+
+### Test Cases
+1. **Reset Condition**: Applies a reset signal to initialize the system, ensuring that all rule outputs and combined outputs start from a known state.
+2. **Rule Conditions**: Defines rule conditions, specifying which input membership functions are considered for each rule and assigning input degrees. Each rule is configured to use either AND or OR logic based on the `rule_type_array`.
+3. **Monitor Rule Outputs**: Observes and reports the outputs for each rule individually and the combined outputs, verifying that the module correctly evaluates each rule and produces the final fuzzy membership values for each output membership function.
+
+### Testbench Simulation
+The following image illustrates the simulation results of the rule base testbench, showing the intermediate and final outputs for the rule evaluations:
+
+![Rule Base Testbench Simulation](../images/RuleBase_TestBench.png)
+
 
 ---
 
@@ -105,17 +123,28 @@ The `tb_rule_base` file tests the `rule_base` module, which applies fuzzy logic 
 ### File: `input_tb.vhd`
 
 ### Overview
-The `input_tb` file tests the `input` module responsible for fuzzifying a crisp input value into fuzzy membership degrees. The module is tested with various crisp input values and different membership functions defined by points and slopes.
+The `input_tb` testbench verifies the functionality of the input module, which fuzzifies a crisp input value into fuzzy membership degrees. This module is designed to handle any number of membership functions by accepting arrays of points and slopes, making it flexible and reusable. The testbench applies different crisp input values across various points of the membership functions to observe how the module computes the membership degrees.
 
-### Signals:
-- **crisp_input_tb**: Input value to be fuzzified.
-- **membership_degrees_tb**: Fuzzified membership degrees.
+### Purpose
+This testbench ensures that the input module can accurately convert crisp inputs into fuzzy membership degrees across multiple membership functions. By testing various points along the membership functions, the testbench validates the module’s ability to handle rising edges, peaks, and falling edges, ensuring reliable fuzzification for different input conditions.
 
-### Test Cases:
-1. **Reset condition**: Applies a reset signal to initialize the module.
-2. **Test various crisp inputs**:
-    - Apply crisp input values at various points along the membership functions (e.g., rising edges, peaks, and falling edges).
-    - Crisp inputs such as 7, 15, 25, and 33 are tested to observe the behavior of each membership function.
+### Signals
+- **crisp_input_tb**: An 8-bit input value to be fuzzified, representing a crisp input signal.
+- **membership_degrees_tb**: The fuzzified membership degrees output, representing the degree of each membership function after processing the input.
+
+### Test Cases
+1. **Reset Condition**: Applies a reset signal to initialize the module, ensuring all internal states start from a known baseline.
+2. **Test Various Crisp Inputs**:
+   - **Crisp Input = 7**: Tests the input on the falling edge of the first membership function and rising edge of the second.
+   - **Crisp Input = 15**: Tests the input at the peak of the second membership function.
+   - **Crisp Input = 25**: Tests another peak condition for the second membership function.
+   - **Crisp Input = 33**: Observes behavior on the falling edge of the second and rising edge of the third membership function.
+   - **Crisp Input = 37**: Tests the falling edge of the third membership function.
+
+### Testbench Simulation
+The following image shows the simulation results for the input testbench, displaying the fuzzified membership degrees across different crisp inputs:
+
+![Input Testbench Simulation](../images/Input_TestBench.png)
 
 ---
 
@@ -124,21 +153,30 @@ The `input_tb` file tests the `input` module responsible for fuzzifying a crisp 
 ### File: `Tipping_Controller_tb.vhd`
 
 ### Overview
-The `Tipping_Controller_tb` file tests the `Tipping_Controller` module, which evaluates two inputs (`taste` and `service`) and outputs a tip amount based on fuzzy logic rules. This testbench simulates a tipping scenario where taste and service scores are evaluated, and the corresponding tip amount is calculated.
+The `Tipping_Controller_tb` file tests the `Tipping_Controller` module, which evaluates two inputs, `taste` and `service`, and outputs a tip amount based on fuzzy logic rules. This testbench simulates a tipping scenario where quality scores for taste and service are assessed, and the resulting tip amount is calculated using a set of fuzzy rules.
 
-### Signals:
+### Purpose
+This testbench ensures that the `Tipping_Controller` module accurately processes taste and service inputs and generates a corresponding tip output. By evaluating various input combinations, the testbench verifies that the fuzzy logic rules correctly apply different degrees of tipping based on input quality.
+
+### Signals
 - **taste_input**: Input signal representing the quality of the taste.
 - **service_input**: Input signal representing the quality of the service.
-- **tip_output**: Output signal representing the calculated tip.
-- **reset**: A reset signal to initialize the controller.
+- **tip_output**: Output signal representing the calculated tip amount.
+- **reset**: A reset signal to initialize the controller, ensuring a consistent starting state for each test.
 
-### Test Cases:
-1. **Reset condition**: Applies reset to initialize the system.
-2. **Taste = 0, Service = 0**: Tests the controller's response with the lowest possible scores.
-3. **Taste = 145, Service = 145**: Tests with average scores for both taste and service.
-4. **Taste = 55, Service = 200**: Tests with a low taste score and a high service score.
-5. **Taste = 200, Service = 182**: Tests with a high taste score and an average service score.
-6. **Taste = 200, Service = 200**: Tests with high taste score and a high service score.
+### Test Cases
+1. **Reset Condition**: Applies a reset signal to initialize the system and ensure all states start from a known baseline.
+2. **Taste = 0, Service = 0**: Tests the controller’s response with the lowest possible scores for taste and service.
+3. **Taste = 145, Service = 145**: Evaluates the controller with average scores for both taste and service.
+4. **Taste = 55, Service = 200**: Tests a scenario with a low taste score and a high service score.
+5. **Taste = 200, Service = 182**: Examines the output with a high taste score and an average service score.
+6. **Taste = 200, Service = 200**: Tests with high scores for both taste and service to observe the tipping behavior for excellent conditions.
+
+### Testbench Simulation
+The following image shows the simulation results for the tipping testbench, illustrating how the fuzzy logic rules evaluate taste and service inputs to calculate the tip amount:
+
+![Tipping Testbench Simulation](../images/Tipping_TestBench.png)
+
 
 ---
 
