@@ -51,6 +51,13 @@ The fuzzy controller is designed to maintain optimal room temperature by regulat
 5. **Temperature = 32 degrees**: Assesses the controller’s behavior when the temperature is in the medium range, expecting a medium heating output.
 6. **Temperature = 33 degrees**: Verifies the response just above the medium threshold.
 
+### Testbench Simulation
+
+The following image shows the simulation results of the fuzzy controller testbench, illustrating how the system responds to various temperature inputs:
+
+![Testbench Simulation](../images/Package_TestBench.png)
+
+
 ---
 
 ## Output Module Testbench
