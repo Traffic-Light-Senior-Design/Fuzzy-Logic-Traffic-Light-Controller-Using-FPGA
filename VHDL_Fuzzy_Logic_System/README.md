@@ -34,7 +34,7 @@ The **Membership_Fuzzification** function calculates the membership degrees for 
    - The input is completely outside the fuzzy set, so the membership degree is set to 0.
 
 2. **If the Input is Between point1 and point2 (Rising Slope)**:
-   - The membership degree is calculated based on the rise slope (`slope1`). The formula is:
+   - The membership degree is calculated based on the rise slope (`slope1`).
      membership_degree = (input - point1) * slope1
    - The result is then divided by the scaling factor:
      membership_degree = calculated_degree / scaling_factor
