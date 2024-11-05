@@ -17,20 +17,39 @@ This repository contains the testbench files for verifying the functionality of 
 ### File: `Fuzzy_Controller_tb.vhd`
 
 ### Overview
-This testbench tests the full fuzzy controller module, simulating the control logic for a heating system based on room temperature. The system evaluates the room temperature and outputs a control signal for the heater based on fuzzy logic rules.
+This testbench validates the functionality and integration of the fuzzy logic package by simulating control logic for a heating system based on room temperature. All the core functions and types from the fuzzy package are used within a single entity-architecture file, ensuring that the package operates correctly as a complete system. The testbench verifies that the fuzzy logic system can evaluate the room temperature and generate appropriate heater control signals using fuzzy rules.
 
-### Signals:
-- **room_temperature**: Simulated input for the room temperature.
-- **heater_output**: Output signal that controls the heater.
-- **reset**: A reset signal that initializes the system.
+### Purpose
+The fuzzy controller is designed to maintain optimal room temperature by regulating the heater based on predefined fuzzy logic rules. The controller interprets temperature inputs in terms of Low, Medium, and High membership degrees and translates these into specific heating outputs. This initial testbench provides a foundation for testing the package’s reusable functions before more complex integration.
 
-### Test Cases:
-1. **Reset condition**: Applies a reset signal to initialize the system.
-2. **Temperature = 7 degrees**: Tests the controller's response when the temperature is set to 7 degrees.
-3. **Temperature = 8 degrees**: Tests the controller's response when the temperature is set to 8 degrees.
-4. **Temperature = 9 degrees**: Tests the controller's response when the temperature is set to 9 degrees.
-5. **Temperature = 32 degrees**: Tests the controller's response when the temperature is set to 32 degrees.
-6. **Temperature = 33 degrees**: Tests the controller's response when the temperature is set to 33 degrees.
+### Signals
+- **room_temperature**: An 8-bit input signal that represents the simulated room temperature.
+- **heater_output**: An 8-bit output signal used to control the heater based on the fuzzy evaluation.
+- **reset**: A control signal used to initialize or reset the system state, ensuring consistent starting conditions for each test case.
+- **clk**: A clock signal, primarily for synchronized operations and simulating real-time conditions.
+
+### Internal Logic and Variables
+1. **Temperature Membership Functions**: Defined for Low, Medium, and High temperatures, each using triangular and trapezoidal functions to model temperature regions.
+   - **Low**: Covers temperatures from 0 to 50 degrees.
+   - **Medium**: Spans 25 to 75 degrees, with a flat segment.
+   - **High**: Represents temperatures from 50 to 100 degrees.
+
+2. **Membership Degrees**: Each temperature range is assigned a fuzzy degree (Low, Medium, High), which represents the degree of membership for the input temperature.
+
+3. **Rule Outputs**: Based on fuzzy logic rules that determine the heater’s output level.
+   - **Low Temp** -> **High Heater Output**
+   - **Medium Temp** -> **Medium Heater Output**
+   - **High Temp** -> **Low Heater Output**
+
+4. **Defuzzification**: Converts fuzzy rule outputs into a single crisp control signal for the heater.
+
+### Test Cases
+1. **Reset Condition**: Applies a reset signal to initialize the system, ensuring that all signals and memory states start from a known state.
+2. **Temperature = 7 degrees**: Tests the controller’s behavior at a low temperature, expected to trigger a high heating output.
+3. **Temperature = 8 degrees**: Evaluates the controller’s response at a slightly higher low temperature.
+4. **Temperature = 9 degrees**: Tests the controller’s output as temperature remains within the low range.
+5. **Temperature = 32 degrees**: Assesses the controller’s behavior when the temperature is in the medium range, expecting a medium heating output.
+6. **Temperature = 33 degrees**: Verifies the response just above the medium threshold.
 
 ---
 
