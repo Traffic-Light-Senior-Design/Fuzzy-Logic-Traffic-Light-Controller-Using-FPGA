@@ -31,25 +31,17 @@ graph TD
     subgraph Fuzzy_Controller
         direction LR
         A1[Crisp Input Signal] --> B1[Input Module]
-        B1 --> D1[Rule Base Module]
-        D1 --> F1[Output Module]
+        B1 -->|Fuzzified Membership Degrees| D1[Rule Base Module]
+        D1 -->|Fuzzy Rule Outputs| F1[Output Module]
         F1 --> G1[Crisp Output Signal]
     end
 
     subgraph Final_Modules
         direction TB
-        B1 -- Uses --> Z1[Fuzzy_Package]
-        D1 -- Uses --> Z1
-        F1 -- Uses --> Z1
+        B1 -. Uses .-> Z1[Fuzzy_Package]
+        D1 -. Uses .-> Z1
+        F1 -. Uses .-> Z1
     end
-
-    %% Label Inputs and Outputs
-    B1 -- Crisp Input --> A1
-    F1 -- Crisp Output --> G1
-    
-    %% Inputs/Outputs to and from Rule Base
-    B1 -- Fuzzified Membership Degrees --> D1
-    D1 -- Fuzzy Rule Outputs --> F1
 ```
 
 ## Installation and Usage
