@@ -12,16 +12,151 @@ The `Test_Files` folder includes testbenches for each of the modules found in th
 
 ## How It Works
 
-The fuzzy logic system is divided into three main stages: **fuzzification**, **rule evaluation**, and **defuzzification**. Each of these stages is handled by a specific module, and they work together to process the input, apply fuzzy rules, and generate a crisp output.
+The fuzzy logic system is composed of three main stages: **fuzzification**, **rule evaluation**, and **defuzzification**. Each stage is managed by a separate module that processes inputs, applies fuzzy logic rules, and generates a single, actionable output. This section provides a deep dive into the calculations, data structures, and interactions within each stage.
+
+---
 
 ### 1. Fuzzification (Input Module)
-The first step in the fuzzy logic process is fuzzification. The input module (`input.vhd`) takes a crisp input signal (for example, a temperature reading) and converts it into fuzzy membership degrees based on predefined membership functions (such as "low," "medium," or "high"). These membership degrees represent the degree to which the input belongs to each fuzzy set.
+
+The **fuzzification** stage begins in the **input module** (`input.vhd`). This module's role is to convert a crisp input (e.g., temperature, speed) into fuzzy membership degrees for predefined fuzzy sets (e.g., "low," "medium," "high").
+
+#### Membership Functions and Scaling Factor
+Each fuzzy set is described by a **membership function**, defined by:
+- **`point1` and `point2`**: These are the start and end points of the fuzzy set, controlling where the fuzzy degree transitions between zero and full membership.
+- **`slope1` and `slope2`**: These slopes define the rate at which the membership degree increases (from `point1` to peak) and decreases (from peak to `point2`).
+
+To allow accurate handling of fractional slopes, a **scaling factor** (default 100) is applied. This scaling factor lets the system represent slopes like 0.25 or 0.5 as integers by multiplying by 100 (e.g., 0.25 becomes 25). Users should multiply slope values by the scaling factor to maintain the desired precision.
+
+#### Membership Degree Calculation
+The **`Membership_Fuzzification`** function calculates the membership degrees for each fuzzy set based on the crisp input. Below is a breakdown of how this calculation works:
+
+1. **If the Crisp Input is Before `point1`**:
+   - The input is completely outside the fuzzy set, so the membership degree is set to 0.
+
+2. **If the Input is Between `point1` and `point2` (Rising Slope)**:
+   - The membership degree is calculated based on the rise slope (`slope1`). The formula is:
+     \[
+     \text{membership degree} = (\text{input} - \text{point1}) \times \text{slope1}
+     \]
+   - The result is then divided by the scaling factor:
+     \[
+     \text{membership degree} = \frac{\text{calculated degree}}{\text{scaling factor}}
+     \]
+
+3. **If the Input is at `point2`**:
+   - The degree reaches its peak, so the membership degree is set to 255.
+
+4. **If the Input is Beyond `point2` (Falling Slope)**:
+   - The degree decreases based on the fall slope (`slope2`), calculated as:
+     \[
+     \text{membership degree} = 255 - \left((\text{input} - \text{point2}) \times \text{slope2}\right)
+     \]
+   - This result is then divided by the scaling factor to yield the final membership degree.
+
+The `Membership_Fuzzification` function loops through each fuzzy set, performing these calculations and creating a vector of membership degrees, with each element representing the degree of membership for one fuzzy set.
+
+#### Handling Multiple Inputs
+When there are multiple inputs (e.g., taste, service), each input is fuzzified independently. The results are then **concatenated** to form a combined vector of membership degrees (`mf_degrees_all`), where each input has its own section in the combined vector. For example, if `taste` has two membership degrees and `service` has two as well, `mf_degrees_all` would be:
+
+\[
+\text{mf\_degrees\_all} = [\text{taste\_low}, \text{taste\_high}, \text{service\_poor}, \text{service\_excellent}]
+\]
+
+This concatenation allows the rule base to evaluate all membership degrees in a unified way.
+
+---
 
 ### 2. Rule Evaluation (Rule Base Module)
-Once the input has been fuzzified, the rule base module (`rule_base.vhd`) evaluates the fuzzified input values according to the fuzzy rules defined in the system. These rules can apply AND/OR logic (conjunction/disjunction) to multiple fuzzy sets. The rule base outputs fuzzy membership degrees for the output fuzzy sets (e.g., "low heat," "medium heat," "high heat").
+
+The **rule evaluation** stage happens in the **rule base module** (`rule_base.vhd`). This module uses the membership degrees from the input module, applies fuzzy logic rules, and determines the fuzzy degrees for the output sets.
+
+#### Rule Structure and Matrix Representation
+The rule base is highly flexible, using vectors and matrices to store the rules. Here’s how it works:
+
+1. **Rule Type Array (`rule_type_array`)**:
+   - This vector defines the logic operation for each rule: AND (0) or OR (1).
+   - For instance, `rule_type_array = [0, 0, 1, 1]` means that the first two rules use AND logic, while the last two use OR logic.
+
+2. **Rule Conditions Matrix (`rule_conditions_array`)**:
+   - This matrix specifies which membership degrees each rule considers. Each row represents a rule, and each column corresponds to a fuzzy set in `mf_degrees_all`.
+   - For example, suppose `rule_conditions_array` is:
+     \[
+     \begin{bmatrix}
+     1 & 0 & 1 & 0 \\
+     0 & 1 & 1 & 0 \\
+     1 & 0 & 0 & 1 \\
+     0 & 1 & 0 & 1 \\
+     \end{bmatrix}
+     \]
+   - This matrix would mean:
+     - **Rule 1**: Applies to `taste_low` AND `service_poor`.
+     - **Rule 2**: Applies to `taste_high` AND `service_poor`.
+     - **Rule 3**: Applies to `taste_low` AND `service_excellent`.
+     - **Rule 4**: Applies to `taste_high` AND `service_excellent`.
+
+3. **Output Notation Array (`output_notation`)**:
+   - This array assigns each rule to an output fuzzy set. For example, `output_notation = [1, 2, 2, 3]` might mean:
+     - Rule 1 maps to the "low" output fuzzy set.
+     - Rules 2 and 3 both map to "medium."
+     - Rule 4 maps to "high."
+
+#### Conjunction (AND) and Disjunction (OR) Operations
+Each rule combines multiple inputs using AND or OR, determined by `rule_type_array`:
+
+- **AND (Conjunction)**: The **`conjunction`** function computes the minimum degree among the inputs:
+  \[
+  \text{conjunction result} = \min(\text{membership degrees})
+  \]
+  - This approach reflects the "weakest link," where a low degree in one input reduces the overall membership degree.
+
+- **OR (Disjunction)**: The **`disjunction`** function computes the maximum degree:
+  \[
+  \text{disjunction result} = \max(\text{membership degrees})
+  \]
+  - This represents the "strongest link," where a high degree in any input elevates the membership degree.
+
+The rule base module iterates through each rule, checks the relevant inputs based on `rule_conditions_array`, applies the AND/OR logic based on `rule_type_array`, and stores the result in `rule_output`.
+
+#### Finalizing Output Degrees
+When multiple rules affect the same output fuzzy set (e.g., both Rules 2 and 3 map to "medium"), the results are combined using disjunction (OR logic) to yield a final fuzzy degree for each output set. This is stored in **`combined_outputs`**. For instance:
+
+\[
+\text{combined\_outputs} = [\text{low}, \max(\text{medium1, medium2}), \text{high}]
+\]
+
+---
 
 ### 3. Defuzzification (Output Module)
-In the final step, the output module (`output.vhd`) takes the fuzzy membership degrees from the rule base and converts them into a single crisp output value through a process called defuzzification. This is typically done using the centroid (center of gravity) method, which computes a weighted average of the fuzzy degrees and their corresponding singleton values (crisp outputs).
+
+In the **defuzzification** stage, the **output module** (`output.vhd`) converts the fuzzy degrees from `combined_outputs` into a single crisp output, like a specific fan speed or heater level.
+
+#### Centroid Calculation (Weighted Average)
+The **`Defuzzification`** function converts fuzzy degrees into a crisp output using the centroid method. Here’s a breakdown of the calculation:
+
+1. **Weighted Sum of Fuzzy Degrees and Singletons**:
+   - For each fuzzy set, multiply its degree by its singleton value (e.g., 10 for "low," 50 for "medium," 90 for "high"):
+     \[
+     \text{weighted sum} = \sum (\text{membership degree} \times \text{singleton value})
+     \]
+   - If "medium" has two contributions (e.g., from Rules 2 and 3), it’s combined via disjunction before this calculation.
+
+2. **Sum of Degrees**:
+   - Sum all membership degrees for the output fuzzy sets:
+     \[
+     \text{sum of degrees} = \sum (\text{membership degrees})
+     \]
+
+3. **Crisp Output Calculation**:
+   - Divide the weighted sum by the sum of degrees to get the centroid:
+     \[
+     \text{crisp output} = \frac{\text{weighted sum}}{\text{sum of degrees}}
+     \]
+   - This yields a crisp value within the control range, balancing the fuzzy degrees.
+
+The defuzzified output becomes the system’s final output, ready for use in control applications.
+
+---
+
 
 ### Overall Workflow Diagram
 Here is a diagram that explains how the modules are connected and how data flows through the system:
