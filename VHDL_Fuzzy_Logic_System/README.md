@@ -27,6 +27,10 @@ Each fuzzy set is described by a **membership function**, defined by:
 
 To allow accurate handling of fractional slopes, a **scaling factor** (default 100) is applied. This scaling factor lets the system represent slopes like 0.25 or 0.5 as integers by multiplying by 100 (e.g., 0.25 becomes 25). Users should multiply slope values by the scaling factor to maintain the desired precision.
 
+#### Universe of Discourse and Y-Axis Precision
+The universe of discourse for the input variables is set from 0 to 100, representing a percentage scale for traffic density in each lane. This allows for intuitive adjustments based on traffic conditions. Additionally, the Y-axis in the system spans from 0 to 255, maximizing the precision of membership degrees within an 8-bit range. This range utilizes the full capability of an 8-bit vector, ensuring high-resolution control over fuzzy membership levels.
+
+
 #### Membership Degree Calculation
 The **Membership_Fuzzification** function calculates the membership degrees for each fuzzy set based on the crisp input. Below is a breakdown of how this calculation works:
 
@@ -46,6 +50,10 @@ The **Membership_Fuzzification** function calculates the membership degrees for 
    - The degree decreases based on the fall slope (`slope2`), calculated as:
      membership_degree = 255 - ((input - point2) * slope2)
    - This result is then divided by the scaling factor to yield the final membership degree.
+   
+![Membership Degree Calculation](../images/Input_MF.png)
+*Illustration of membership degree calculations across fuzzy sets, demonstrating transitions between low, medium, and high values.*
+
 
 The `Membership_Fuzzification` function loops through each fuzzy set, performing these calculations and creating a vector of membership degrees, with each element representing the degree of membership for one fuzzy set.
 
@@ -109,6 +117,9 @@ The rule base module iterates through each rule, checks the relevant inputs base
 When multiple rules affect the same output fuzzy set (e.g., both Rules 2 and 3 map to "medium"), the results are combined using disjunction (OR logic) to yield a final fuzzy degree for each output set. This is stored in combined_outputs. For instance:
 
 combined_outputs = [low, max(medium1, medium2), high]
+
+![Rule Evaluation Output Degrees](../images/Output_MF.jpg)
+*Visual representation of rule evaluation and finalizing output degrees based on conjunction and disjunction operations.*
 
 ---
 
