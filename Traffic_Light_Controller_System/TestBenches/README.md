@@ -14,6 +14,7 @@ The expected values in the test cases are estimates and may differ from the actu
 | [L6 Sequence Testbench](#l6-sequence-testbench) | Verifies the functionality of the L6 Sequence Controller     |
 | [L9 Sequence Testbench](#l9-sequence-testbench) | Verifies the functionality of the L9 Sequence Controller     |
 | [State Machine Testbench](#state-machine-testbench) | Verifies the overall state machine and sequence coordination |
+| [Input Scalar TestBench](#input-scalar-testbench) | Scales the sensor inputs to match the Universe of Discourse required by the project |
 
 ---
 
