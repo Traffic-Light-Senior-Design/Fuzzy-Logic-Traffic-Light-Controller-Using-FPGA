@@ -11,15 +11,17 @@ The **UART Modules** and **Fuzzy Input Modules** used in this project are explai
 This README provides a detailed look at:
 - A general overview of how each traffic light sequence operates.
 - The state machine that connects and coordinates these sequences.
-- The input scalar module and top module integration.
+- The input scalar module, debounce filter, and top module integration.
 
 ### Table of Contents
 | Section                                      | Description                                                 |
 |----------------------------------------------|-------------------------------------------------------------|
-| [Sequence Controllers Overview](#traffic-light-sequence-controller) | General explanation of how each traffic light sequence operates. |
+| [Sequence Controllers Overview](#traffic-light-sequence-controller-general-documentation) | General explanation of how each traffic light sequence operates. |
 | [State Machine](#state-machine)              | Overview of the state machine connecting the sequences.      |
-| [Input Scalar Module](#input-scalar-module)  | To be added                                                 |
-| [Top Module](#top-module)                    | To be added                                                 |
+| [Input Scalar Module](#input-scalar-module)  | Manages real-time traffic input data and scales it accordingly. |
+| [Debounce Filter Module](#debounce-filter-module) | Stabilizes input signals to avoid erroneous transitions.      |
+| [Top Module](#top-module)                    | Integrates all components, forming the complete system.     |
+| [Constraints](#additional-files)             | The Constraints file used for the kria kr260		     |
 
 ## Traffic Light Sequence Controller - General Documentation
 
@@ -163,7 +165,43 @@ Through this coordinated FSM structure, the **Sequence_State_Machine** efficient
 
 
 ## Input Scalar Module
-To be added
+
+The **Input_Scalar** module manages real-time sensor data, converting raw sensor inputs into scaled values that fit the fuzzy logic system’s universe of discourse (0-100). Each lane’s sensors detect traffic density and translate it into a traffic density percentage for fuzzy logic processing.
+
+### Purpose
+The **Input_Scalar** module ensures that each lane’s sensor input is properly scaled according to the lane's specific sensor configuration. By translating the sensor counts into an 8-bit output on a 0-100 scale, the module aligns with the fuzzy logic system’s universe of discourse, enabling seamless integration with the sequence controllers.
+
+### Scaling Logic
+- **Three-Sensor Lanes (e.g., L1, L6, L7L8)**: Each lane has up to three sensors. Depending on the number of active sensors (indicating the number of cars), the module outputs values of `33`, `66`, or `99` to reflect traffic density as a percentage. For instance, if one sensor is active, the output is `33`, representing approximately 33% traffic density.
+- **Two-Sensor Lanes (e.g., L4, L5)**: Each lane with two sensors outputs either `50` or `100` to represent half or full traffic capacity. This simplifies fuzzy logic calculations and maintains consistency across the modules.
+
+---
+
+## Debounce Filter Module
+
+The **Debounce_Filter** module stabilizes sensor signals, preventing transient noise from affecting system behavior. Since vehicle sensors may intermittently change state as cars move over them, this module ensures accurate, consistent input to the traffic control system.
+
+### Purpose and Benefits
+Originally, sensor noise led to frequent, unintended changes in light duration and crosswalk timers. As cars moved across sensors, rapid changes in input data caused fluctuating green light durations and multiple crosswalk activations. With the **Debounce_Filter**, sensor readings remain stable, ensuring that each lane holds its initial traffic density value throughout the green light duration. The crosswalk timer no longer resets mid-sequence due to sensor fluctuations, creating smoother transitions.
+
+### Implementation Details
+Each sensor input is passed through a filter with a specific debounce limit, ensuring stability by counting clock cycles. If the sensor input remains stable for the defined debounce limit, the output state updates, effectively filtering out minor input changes due to noise.
+
+---
 
 ## Top Module
-To be added
+
+The **Final_Top** module is the highest-level module in the system, responsible for integrating all other components and linking the system to physical hardware through peripheral ports. It connects the traffic light system to the external constraints file, bridging the internal VHDL logic with physical outputs.
+
+### Key Features and Structure
+- **Peripheral-Based Entity Design**: The entity ports are configured to connect to real-world components like sensors, lights, and crosswalk buttons via PMODs, GPIOs, and other FPGA interfaces. This approach enables straightforward integration with the constraints file and physical hardware.
+- **Component Connections**: Through port mapping, the **Final_Top** module interconnects the **Debounce Filter**, **Input_Scalar**, and **Sequence_State_Machine** modules, establishing signal flow between them.
+- **Role in the System**: Serving as the central hub, **Final_Top** collects sensor data, processes it through the fuzzy logic-based state machine, and controls the physical traffic lights and crosswalk signals in real time, making it the project’s highest hierarchical element and the primary interface to the physical world.
+
+--- 
+
+## Additional Files
+
+### io_map.xdc
+The `io_map.xdc` file is a constraints file tailored for the Kria KR260 board and Vivado. This file maps specific I/O ports for this project’s hardware setup, defining connections between the FPGA pins and external peripherals such as traffic lights, sensors, and crosswalk buttons. While this constraints file is exclusive to the Kria KR260 and Vivado, it can be used as a reference for similar configurations on other hardware setups.
+

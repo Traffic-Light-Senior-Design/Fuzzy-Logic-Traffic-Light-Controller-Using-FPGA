@@ -182,4 +182,32 @@ This testbench confirms that the **Sequence_State_Machine** operates as intended
 
 ---
 
+## Input Scalar Testbench
+
+**File**: `Input_Scalar_TB.vhd`
+
+### Overview
+The **Input Scalar Testbench** verifies the functionality of the `Input_Scalar` module, which is responsible for scaling raw sensor inputs into values on a 0-100 scale. The output represents the traffic density as a percentage, aligning with the fuzzy logic system’s universe of discourse.
+
+### Purpose
+The testbench aims to confirm that the `Input_Scalar` module accurately converts the sensor inputs from each lane into traffic density percentages based on the number of active sensors. This is essential for providing appropriately scaled inputs to the fuzzy logic system, as it relies on a standardized 0-100 range.
+
+### Signals
+- **clk**: System clock signal.
+- **L1_sensors** through **L9_sensors**: Input signals representing the raw sensor values for lanes L1, L2L3, L4, L5, L6, L7L8, and L9.
+- **L1** through **L9**: Scaled 8-bit output signals representing traffic density on a 0-100 scale.
+
+### Test Cases
+1. **All Sensors Off**: Tests the module with no active sensors, expecting minimum output values.
+2. **Partial Sensors On**: Applies various sensor values to observe intermediate density levels.
+3. **Max Sensors Active**: Tests with maximum sensors active on each lane to confirm correct 100% scaling.
+4. **Random Sensor Combinations**: Simulates mixed input patterns to ensure accurate scaling across varied inputs.
+
+### Testbench Simulation
+The following image illustrates the results of the Input Scalar testbench simulation:
+
+![Input Scalar Testbench Simulation](../images/Input_Scalar_TestBench.png)
+
+---
+
 Each testbench validates its respective module's operation within the traffic light system, providing reliable tests for real-time traffic control.
