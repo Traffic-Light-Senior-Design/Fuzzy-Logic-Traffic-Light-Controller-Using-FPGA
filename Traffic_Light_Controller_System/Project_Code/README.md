@@ -16,7 +16,7 @@ This README provides a detailed look at:
 ### Table of Contents
 | Section                                      | Description                                                 |
 |----------------------------------------------|-------------------------------------------------------------|
-| [Sequence Controllers Overview](#sequence-controllers-overview) | General explanation of how each traffic light sequence operates. |
+| [Sequence Controllers Overview](#traffic-light-sequence-controller) | General explanation of how each traffic light sequence operates. |
 | [State Machine](#state-machine)              | Overview of the state machine connecting the sequences.      |
 | [Input Scalar Module](#input-scalar-module)  | To be added                                                 |
 | [Top Module](#top-module)                    | To be added                                                 |
