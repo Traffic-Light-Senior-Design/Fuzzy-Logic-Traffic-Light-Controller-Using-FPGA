@@ -1,0 +1,49 @@
+[System]
+Name='L1_ConsiderL2L3_L7L8_MamdaniSequence_TrafficLightController_1'
+Type='mamdani'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=9
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='L1'
+Range=[0 100]
+NumMFs=3
+MF1='Low':'trimf',[0 0 45]
+MF2='Medium':'trimf',[10 45 80]
+MF3='High':'trapmf',[45 80 100 100]
+
+[Input2]
+Name='L2L3_L7L8'
+Range=[0 100]
+NumMFs=3
+MF1='Low':'trimf',[0 0 45]
+MF2='Medium':'trimf',[10 45 80]
+MF3='High':'trapmf',[45 80 100 100]
+
+[Output1]
+Name='GreenLightDuration'
+Range=[15 30]
+NumMFs=5
+MF1='Very Low':'trimf',[15 15 18.75]
+MF2='Low':'trimf',[15 18.75 22.5]
+MF3='Medium':'trimf',[18.75 22.5 26.25]
+MF4='High':'trimf',[22.5 26.25 30]
+MF5='Very High':'trimf',[26.25 30 30]
+
+[Rules]
+1 1, 3 (1) : 1
+2 1, 4 (1) : 1
+3 1, 5 (1) : 1
+1 2, 2 (1) : 1
+2 2, 3 (1) : 1
+3 2, 4 (1) : 1
+1 3, 1 (1) : 1
+2 3, 2 (1) : 1
+3 3, 3 (1) : 1
