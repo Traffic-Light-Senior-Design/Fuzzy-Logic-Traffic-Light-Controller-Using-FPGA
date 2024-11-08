@@ -1,7 +1,6 @@
 
 # Traffic Light Fuzzy Logic Controller Using MATLAB
 
----
 
 ## Project Overview
 
