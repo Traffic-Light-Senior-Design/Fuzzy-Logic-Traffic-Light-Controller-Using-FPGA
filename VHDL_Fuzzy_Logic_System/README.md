@@ -54,6 +54,7 @@ The **Membership_Fuzzification** function calculates the membership degrees for 
 ![Membership Degree Calculation](images/Input_MF.png)
 *Illustration of membership degree calculations across fuzzy sets, demonstrating transitions between low, medium, and high values.*
 
+<img src="images/Input_MF.jpg" alt="Input Membership Function" width="400"/>
 
 The `Membership_Fuzzification` function loops through each fuzzy set, performing these calculations and creating a vector of membership degrees, with each element representing the degree of membership for one fuzzy set.
 
