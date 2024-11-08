@@ -4,19 +4,19 @@
 ---
 
 ## Project Overview
----
+
 
 This repository contains a MATLAB-based implementation of a Traffic Light Controller System using Fuzzy Logic, designed to optimize green light durations at a busy four-way intersection. This system improves traffic flow by dynamically adjusting green light times based on real-time traffic densities in each lane.
 
 ### Intersection Layout
----
+
 
 The intersection consists of:
 - **North-South**: Three lanes in each direction (L1, L2, and L3 for the northbound and L6, L7, and L8 for the southbound).
 - **East-West**: Two lanes coming from the East (L4 and L5) and one lane from the West (L9).
 
 ### Traffic Flow Sequence
----
+
 
 The traffic light controller follows a fixed sequence:
 1. L1 (northbound left turn only).
@@ -28,7 +28,7 @@ The traffic light controller follows a fixed sequence:
 Each FIS file corresponds to one sequence, determining the active green light duration based on traffic densities in the primary lane and the competing lanes in the current sequence.
 
 ## Motivation for Fuzzy Logic
----
+
 
 Fuzzy Logic allows the traffic light controller to adapt to real-world variability in traffic densities without requiring rigid thresholds. By using fuzzy rules and membership functions, the controller:
 - Minimizes average waiting time.
@@ -36,7 +36,7 @@ Fuzzy Logic allows the traffic light controller to adapt to real-world variabili
 - Dynamically adjusts green time according to changing traffic conditions.
 
 ## System Components
----
+
 
 ### Fuzzification
 
@@ -70,7 +70,7 @@ The system includes five FIS files, each controlling green time for one of the s
 Each file’s rule base ensures that green time for the primary lane in the sequence is optimized relative to the traffic in competing lanes.
 
 ## Using the MATLAB Fuzzy Logic Designer Toolbox
----
+
 
 To visualize and fine-tune the system, use the **MATLAB Fuzzy Logic Designer Toolbox**:
 
