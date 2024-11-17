@@ -52,7 +52,7 @@ The **Membership_Fuzzification** function calculates the membership degrees for 
    - This result is then divided by the scaling factor to yield the final membership degree.
    
 ![Membership Degree Calculation](images/Input_MF.png)
-*Illustration of membership degree calculations across fuzzy sets, demonstrating transitions between low, medium, and high values.*
+*Plot illustrating the two membership functions that can be used for this system and their respective characteristics (points and slopes)*
 
 The `Membership_Fuzzification` function loops through each fuzzy set, performing these calculations and creating a vector of membership degrees, with each element representing the degree of membership for one fuzzy set.
 
@@ -118,7 +118,7 @@ When multiple rules affect the same output fuzzy set (e.g., both Rules 2 and 3 m
 combined_outputs = [low, max(medium1, medium2), high]
 
 ![Rule Evaluation Output Degrees](images/Output_MF.jpg)
-*Visual representation of rule evaluation and finalizing output degrees based on conjunction and disjunction operations.*
+*Visual representation of singleton output membership functions representing real life values*
 
 ---
 
