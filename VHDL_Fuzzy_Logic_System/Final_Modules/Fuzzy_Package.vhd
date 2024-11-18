@@ -37,6 +37,9 @@ package Fuzzy_Package is
     -- an array of 1x1 integers to create matrices
     type integer_matrix is array (natural range <>, natural range <>) of integer;
     
+    -- Sequence of bytes for UART transmission for crosswalk timers
+    type byte_array is array (0 to 3) of std_logic_vector(7 downto 0);
+    
     -- Function Membership_Fuzzification takes a crisp input value and uses
     -- the points and slopes to calculate a fuzzy value for each MF.
     function Membership_Fuzzification (crisp_input: in std_logic_vector(7 downto 0); mf_array : membership_functions)
@@ -92,18 +95,25 @@ package body Fuzzy_Package is
             -- Case 2: If the input is between Point1 and Point2, we're in the rising slope or flat part.
             -- We calculate the membership degree using the slope from Point1 to the peak (flat region at 1).
             elsif(crisp_input <= mf_array(i).point2) then
-                -- Calculate how much the membership has increased from Point1 using the slope.
-                intermediate_value := (unsigned(crisp_input) - unsigned(mf_array(i).point1)) * unsigned(mf_array(i).slope1);
                 
-                -- Apply scaling if slope was scaled (by dividing the result by the scaling factor).
-                intermediate_value := intermediate_value / to_unsigned(scaling_factor, 24);
-                
-                -- If the calculated value exceeds the maximum allowed (1), we cap it at 1 (0xFF).
-                if intermediate_value > to_unsigned(16#FF#, 24) then
-                    fuzzy_output := x"FF"; -- Cap at full membership (1).
-                else
-                    -- Otherwise, we assign the calculated value, which gives us the fuzzy output between 0 and 1.
-                    fuzzy_output := std_logic_vector(intermediate_value(7 downto 0)); -- Rising part
+                -- check if slope1 is zero, indicating a flat region
+                if unsigned(mf_array(i).slope1) = 0 then
+                    -- Flat region, so membership degree is 1 (maximum value).
+                    fuzzy_output := x"FF";  -- Full membership degree (1).
+                else 
+                    -- Calculate how much the membership has increased from Point1 using the slope.
+                    intermediate_value := (unsigned(crisp_input) - unsigned(mf_array(i).point1)) * unsigned(mf_array(i).slope1);
+                    
+                    -- Apply scaling if slope was scaled (by dividing the result by the scaling factor).
+                    intermediate_value := intermediate_value / to_unsigned(scaling_factor, 24);
+                    
+                    -- If the calculated value exceeds the maximum allowed (1), we cap it at 1 (0xFF).
+                    if intermediate_value > to_unsigned(16#FF#, 24) then
+                        fuzzy_output := x"FF"; -- Cap at full membership (1).
+                    else
+                        -- Otherwise, we assign the calculated value, which gives us the fuzzy output between 0 and 1.
+                        fuzzy_output := std_logic_vector(intermediate_value(7 downto 0)); -- Rising part
+                    end if;
                 end if;
                 
             -- Case 3: If the input is greater than Point2, we're in the decreasing slope region.
@@ -122,6 +132,7 @@ package body Fuzzy_Package is
                     fuzzy_output := std_logic_vector(x"FF" - intermediate_value(7 downto 0)); -- Falling part
                 end if;
             end if;
+
             
             -- Store the fuzzy output for this MF in the array of outputs.
             membership_values(i) := fuzzy_output;
@@ -185,23 +196,29 @@ package body Fuzzy_Package is
     function Defuzzification (membership_degrees : rule_outputs; singleton : singletons) return std_logic_vector is
         variable final_output : std_logic_vector(7 downto 0); -- this is the final crisp output
         variable product : unsigned (15 downto 0) := (others => '0'); -- Initialize product to 0
-        variable sum : unsigned (7 downto 0) := (others => '0');      -- Initialize sum to 0
+        variable sum : unsigned (15 downto 0) := (others => '0');      -- Initialize sum to 16 bits
+        variable temp_product : unsigned(15 downto 0);
     begin
         -- Loop through all membership degrees and calculate the weighted sum
         for i in singleton'range loop
-            product := product + (unsigned(membership_degrees(i)) * unsigned(singleton(i))); -- Weighted sum
-            sum := sum + unsigned(membership_degrees(i)); -- Sum of membership degrees
+            -- Calculate product of membership degree and singleton
+            temp_product := unsigned(membership_degrees(i)) * unsigned(singleton(i));
             
+            -- Add to the total product and sum
+            product := product + temp_product;
+            sum := sum + unsigned(membership_degrees(i));
+
         end loop;
         
         -- Avoid division by zero if sum is zero
         if sum = 0 then
             final_output := (others => '0');  -- Default to 0 if no rules are activated
         else
-            final_output := std_logic_vector(resize(product / sum, 8)); -- Calculate crisp output
-            
+            -- Calculate the crisp output by dividing the weighted sum by the total sum
+            final_output := std_logic_vector(resize(product / sum, 8)); 
         end if;
-        
+    
+        -- Return the final crisp output
         return final_output;
     end function;
 
