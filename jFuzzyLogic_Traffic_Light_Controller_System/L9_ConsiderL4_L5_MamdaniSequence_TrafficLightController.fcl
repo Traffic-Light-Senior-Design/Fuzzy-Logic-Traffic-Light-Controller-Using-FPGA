@@ -1,0 +1,56 @@
+FUNCTION_BLOCK L9_ConsiderL4_L5_MamdaniSequence_TrafficLightController
+
+VAR_INPUT
+    L9 : REAL;
+    L5 : REAL;
+    L4 : REAL;
+END_VAR
+
+VAR_OUTPUT
+    GreenLightDuration : REAL;
+END_VAR
+
+FUZZIFY L9
+    TERM Low := (0, 1) (0, 1) (10, 1) (45, 0);
+    TERM Medium := (10, 0) (45, 1) (80, 0);
+    TERM High := (45, 0) (80, 1) (100, 1) (100, 1);
+END_FUZZIFY
+
+FUZZIFY L5
+    TERM Low := (0, 1) (0, 1) (20, 1) (80, 0);
+    TERM High := (20, 0) (80, 1) (100, 1) (100, 1);
+END_FUZZIFY
+
+FUZZIFY L4
+    TERM Low := (0, 1) (0, 1) (20, 1) (80, 0);
+    TERM High := (20, 0) (80, 1) (100, 1) (100, 1);
+END_FUZZIFY
+
+DEFUZZIFY GreenLightDuration
+    TERM Low := (15, 1) (15, 1) (20, 1) (25, 0);
+    TERM Moderate := (20, 0) (26.25, 1) (32.5, 0);
+    TERM ModeratelyHigh := (27.5, 0) (31.75, 1) (36, 0);
+    TERM High := (32.5, 0) (37, 1) (40, 1) (40, 1);
+    METHOD : COG;
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    AND : MIN;
+    OR : MAX;
+    ACT : MIN;
+    ACCU : MAX;
+
+    RULE 1 : IF L9 IS Low AND L5 IS Low AND L4 IS Low THEN GreenLightDuration IS Moderate;
+    RULE 2 : IF L9 IS Low AND L5 IS Low AND L4 IS High THEN GreenLightDuration IS High;
+    RULE 3 : IF L9 IS Low AND L5 IS High AND L4 IS Low THEN GreenLightDuration IS Moderate;
+    RULE 4 : IF L9 IS Low AND L5 IS High AND L4 IS High THEN GreenLightDuration IS High;
+    RULE 5 : IF L9 IS Medium AND L5 IS Low AND L4 IS Low THEN GreenLightDuration IS High;
+    RULE 6 : IF L9 IS Medium AND L5 IS High AND L4 IS Low THEN GreenLightDuration IS ModeratelyHigh;
+    RULE 7 : IF L9 IS Medium AND L5 IS Low AND L4 IS High THEN GreenLightDuration IS High;
+    RULE 8 : IF L9 IS Medium AND L5 IS High AND L4 IS High THEN GreenLightDuration IS ModeratelyHigh;
+    RULE 9 : IF L9 IS High AND L5 IS Low AND L4 IS Low THEN GreenLightDuration IS High;
+    RULE 10 : IF L9 IS High AND L5 IS Low AND L4 IS High THEN GreenLightDuration IS ModeratelyHigh;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK

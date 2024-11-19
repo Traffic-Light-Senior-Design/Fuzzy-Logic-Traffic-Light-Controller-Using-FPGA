@@ -1,0 +1,51 @@
+FUNCTION_BLOCK L2L3_L7L8_MamdaniSequence_TrafficLightController
+
+VAR_INPUT
+    L2_L3 : REAL;
+    L7_L8 : REAL;
+END_VAR
+
+VAR_OUTPUT
+    GreenLightDuration : REAL;
+END_VAR
+
+FUZZIFY L2_L3
+    TERM Low := (0, 1) (0, 1) (45, 0);
+    TERM Medium := (10, 0) (45, 1) (80, 0);
+    TERM High := (45, 0) (80, 1) (100, 1);
+END_FUZZIFY
+
+FUZZIFY L7_L8
+    TERM Low := (0, 1) (0, 1) (45, 0);
+    TERM Medium := (10, 0) (45, 1) (80, 0);
+    TERM High := (45, 0) (80, 1) (100, 1);
+END_FUZZIFY
+
+DEFUZZIFY GreenLightDuration
+    TERM Very_Low := (15, 1) (18.75, 1) (26.25, 0);
+    TERM Low := (15, 0) (26.25, 1) (37.5, 0);
+    TERM Medium := (26.25, 0) (37.5, 1) (48.75, 0);
+    TERM High := (37.5, 0) (48.75, 1) (60, 0);
+    TERM Very_High := (48.75, 0) (56.25, 1) (60, 1);
+    METHOD : COG;
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    AND : MIN;
+    OR : MAX;
+    ACT : MIN;
+    ACCU : MAX;
+
+    RULE 1 : IF L2_L3 IS Low AND L7_L8 IS Low THEN GreenLightDuration IS Very_Low;
+    RULE 2 : IF L2_L3 IS Low AND L7_L8 IS Medium THEN GreenLightDuration IS Low;
+    RULE 3 : IF L2_L3 IS Low AND L7_L8 IS High THEN GreenLightDuration IS Medium;
+    RULE 4 : IF L2_L3 IS Medium AND L7_L8 IS Low THEN GreenLightDuration IS Low;
+    RULE 5 : IF L2_L3 IS Medium AND L7_L8 IS Medium THEN GreenLightDuration IS High;
+    RULE 6 : IF L2_L3 IS Medium AND L7_L8 IS High THEN GreenLightDuration IS Medium;
+    RULE 7 : IF L2_L3 IS High AND L7_L8 IS Low THEN GreenLightDuration IS Medium;
+    RULE 8 : IF L2_L3 IS High AND L7_L8 IS Medium THEN GreenLightDuration IS High;
+    RULE 9 : IF L2_L3 IS High AND L7_L8 IS High THEN GreenLightDuration IS Very_High;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
